@@ -29,9 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
             ];
         } else if (levelId === 'japan') {
             currentObjectives = [
-                { id: 'honra', text: 'Descobrir o símbolo da honra (katana)', done: false },
-                { id: 'sombra', text: 'Encontrar o ninja misterioso', done: false },
-                { id: 'lider', text: 'Desvendar quem comanda o exército (shogun)', done: false },
+                { id: 'honra', text: 'Descobrir o símbolo da honra', done: false },
+                { id: 'sombra', text: 'Encontrar a arte furtiva', done: false },
+                { id: 'lider', text: 'Desvendar quem comanda o exército', done: false },
             ];
         }
 
@@ -3127,4 +3127,5 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', initAudio, { once: true });
     document.addEventListener('keydown', initAudio, { once: true });
 });
+
 
