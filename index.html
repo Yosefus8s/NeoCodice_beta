@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8"> <!-- Codificação do arquivo HTML -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,15 +11,20 @@
     <script src="script.js"></script>
     <title>Game Controller</title>
 </head>
+
 <body>
     <div id="start-screen">
         <h1 class="game-title">NeoCódice</h1>
-        <p class="game-summary" >
-           <span> Bem-vindo à Biblioteca dos Códices Perdidos.<br></span>
-<span>Entre corredores silenciosos e livros empoeirados, cada página guarda um portal para tempos esquecidos. Aqui, o conhecimento não é apenas lido — é vivido.<br>
-Ao abrir um livro antigo, você será transportado para dentro das histórias que moldaram o mundo. Enigmas, charadas e segredos aguardam aqueles que buscam desvendar o passado.<br>
-Descubra, decifre e restaure o que o tempo tentou apagar. Cada página recuperada traz você um passo mais perto do mistério final da Biblioteca.<br>
-        </span></p>
+        <p class="game-summary">
+            <span> Bem-vindo à Biblioteca dos Códices Perdidos.<br></span>
+            <span>Entre corredores silenciosos e livros empoeirados, cada página guarda um portal para tempos
+                esquecidos. Aqui, o conhecimento não é apenas lido — é vivido.<br>
+                Ao abrir um livro antigo, você será transportado para dentro das histórias que moldaram o mundo.
+                Enigmas, charadas e segredos aguardam aqueles que buscam desvendar o passado.<br>
+                Descubra, decifre e restaure o que o tempo tentou apagar. Cada página recuperada traz você um passo mais
+                perto do mistério final da Biblioteca.<br>
+            </span>
+        </p>
         <p class="start-prompt">Pressione ENTER para começar</p>
         <div class="credits">
             <p>Eduardo & José Otávio</p>
@@ -27,10 +33,23 @@ Descubra, decifre e restaure o que o tempo tentou apagar. Cada página recuperad
     </div>
     <canvas id="gameCanvas" width="1280" height="720"></canvas>
     <div id="joystick-container">
-        <div id="joystick-stick"></div>
+        <div id="joystick-stick">
+            <div class="up">▲</div>
+            <div class="left">◀</div>
+            <div class="right">▶</div>
+            <div class="down">▼</div>
+        </div>
     </div>
     <div id="action-button">
         E
     </div>
+    <div id="objectives-panel">
+        <div id="objectives-header">
+            Objetivos
+            <button id="objectives-toggle-btn" title="Mostrar/Ocultar objetivos">−</button>
+        </div>
+        <ul id="objectives-list"></ul>
+    </div>
 </body>
+
 </html>

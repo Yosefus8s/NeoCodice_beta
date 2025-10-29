@@ -1,5 +1,96 @@
-
 document.addEventListener('DOMContentLoaded', () => {
+
+    // --- SISTEMA DE OBJETIVOS ---
+    const objectivesPanel = document.getElementById("objectives-panel");
+    const toggleBtn = document.getElementById("objectives-toggle-btn");
+    const objectivesList = document.getElementById('objectives-list');
+
+
+    let currentObjectives = [];
+
+    // Mostra/oculta painel no mobile
+    if (toggleBtn && objectivesPanel) {
+        toggleBtn.addEventListener("click", () => {
+            const collapsed = objectivesPanel.classList.toggle("collapsed");
+            toggleBtn.textContent = collapsed ? "+" : "−";
+        });
+    }
+
+    // Inicializa os objetivos da fase atual
+    function initObjectives(levelId) {
+        currentObjectives = [];
+        objectivesList.innerHTML = '';
+
+        if (levelId === 'egypt') {
+            currentObjectives = [
+                { id: 'treasure1', text: 'Encontrar o 1º tesouro enterrado', done: false },
+                { id: 'treasure2', text: 'Encontrar o 2º tesouro enterrado', done: false },
+                { id: 'treasure3', text: 'Encontrar o 3º tesouro enterrado', done: false },
+            ];
+        } else if (levelId === 'japan') {
+            currentObjectives = [
+                { id: 'honra', text: 'Descobrir o símbolo da honra (katana)', done: false },
+                { id: 'sombra', text: 'Encontrar o ninja misterioso', done: false },
+                { id: 'lider', text: 'Desvendar quem comanda o exército (shogun)', done: false },
+            ];
+        }
+
+        currentObjectives.forEach(obj => {
+            const li = document.createElement('li');
+            li.id = 'obj-' + obj.id;
+            li.textContent = obj.text;
+            objectivesList.appendChild(li);
+        });
+
+        objectivesPanel.classList.remove('hidden');
+    }
+
+    // Atualiza um objetivo específico
+    function updateObjective(id) {
+        const obj = currentObjectives.find(o => o.id === id);
+        if (obj && !obj.done) {
+            obj.done = true;
+            const li = document.getElementById('obj-' + id);
+            if (li) {
+                li.classList.add('completed');
+                li.innerHTML += ' ✨';
+            }
+
+            // Efeito visual rápido
+            li.animate([
+                { transform: 'scale(1)', filter: 'brightness(1)' },
+                { transform: 'scale(1.2)', filter: 'brightness(2)' },
+                { transform: 'scale(1)', filter: 'brightness(1)' }
+            ], { duration: 800 });
+
+            // Checa se todos concluídos
+            if (currentObjectives.every(o => o.done)) {
+                showObjectiveCompleteEffect();
+            }
+        }
+    }
+
+    // Efeito quando tudo for concluído
+    function showObjectiveCompleteEffect() {
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.background = 'rgba(0,0,0,0.7)';
+        overlay.style.display = 'flex';
+        overlay.style.justifyContent = 'center';
+        overlay.style.alignItems = 'center';
+        overlay.style.fontFamily = "'Press Start 2P', cursive";
+        overlay.style.color = 'gold';
+        overlay.style.fontSize = '20px';
+        overlay.style.textShadow = '0 0 10px gold';
+        overlay.style.zIndex = '99999';
+        overlay.textContent = '🎉 Todos os objetivos concluídos!';
+        document.body.appendChild(overlay);
+        setTimeout(() => overlay.remove(), 2000);
+    }
 
     // --- Desbloqueio de Áudio (Autoplay Policy) ---
     let audioContext;
@@ -37,9 +128,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const joystickContainer = document.getElementById('joystick-container');
     const joystickStick = document.getElementById('joystick-stick');
     const actionButton = document.getElementById('action-button');
+    updateUIVisibility("start");
 
     // --- SISTEMA DE ÁUDIO GLOBAL ---
-    let reverbNode = null;
 
     // Pré-carrega e configura o reverb da livraria
     async function carregarReverb() {
@@ -209,6 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.warn('[EGITO] isLoadingLevel estava travado como TRUE — resetando estado.');
             isLoadingLevel = false; // força o reset
         }
+        updateUIVisibility("jogo");
 
         // Reinicia estados para garantir carregamento
         isLoadingLevel = true;
@@ -432,18 +524,18 @@ document.addEventListener('DOMContentLoaded', () => {
     let questPerguntas = [
         {
             pergunta: 'Sou feito de pedra, volto ao céu em linha reta, tenho corredores que sussurram história secreta. Aponto para as estrelas e guardo um passado real —quem sou eu, guardião do sarcófago e do sinal?',
-            resposta: 'pirâmide',
-            premio: 'Pedra',
+            resposta: 'Pirâmide',
+            premio: 'Engenharia egípcia',
         },
         {
             pergunta: 'Tenho o corpo de leão e a cabeça de homem. Quem sou?',
-            resposta: 'esfinge',
+            resposta: 'Esfinge',
             premio: 'Uma joia de ouro reluzente',
         },
         {
             pergunta: 'Sou um rio que corta o deserto e dá vida às margens. Qual é o meu nome?',
-            resposta: 'nilo',
-            premio: 'Água',
+            resposta: 'Nilo',
+            premio: 'Água potavio',
         }
     ];
     const questPerguntasJapao = [
@@ -620,24 +712,37 @@ document.addEventListener('DOMContentLoaded', () => {
         interativo.errouUltima = false;
 
         if (respostaEstaCorreta(resposta, quest.resposta)) {
-            // Acertou
+            // ✅ Acertou
             interativo.concluida = true;
             questAtiva = false;
 
-            // Imagem e cor variam conforme o mapa atual
             const imgVitoria = currentLevelId === 'japan' ? 'img/japao_intro.png' : 'img/japao_intro.png';
             const corVitoria = currentLevelId === 'japan' ? 'rgba(0, 0, 160, 0.8)' : 'rgba(0, 120, 0, 0.8)';
 
             mostrarCenaComDialogoCor(
                 imgVitoria,
-                `Você acertou!\n\n${quest.premio || ''}`,
+                `Você acertou!\n\n${quest.resposta || ''} \n\n Prêmio: ${quest.premio || ''}`,
                 corVitoria,
                 () => {
                     console.log(`[QUEST] ${interativo.id} concluída com sucesso.`);
                     isDialogOpen = false;
                     moverQuestParaOutroLocal(interativo.id); // libera os outros
 
-                    // Chama a verificação correta conforme o mapa
+                    // 🧭 Atualiza lista de objetivos
+                    if (typeof updateObjective === 'function') {
+                        if (currentLevelId === 'egypt') {
+                            // Cada acerto marca um dos 3 tesouros
+                            const pendente = currentObjectives.find(o => !o.done);
+                            if (pendente) updateObjective(pendente.id);
+                        } else if (currentLevelId === 'japan') {
+                            // Mapeia o objetivo conforme a resposta
+                            if (quest.resposta === 'katana') updateObjective('honra');
+                            else if (quest.resposta === 'ninja') updateObjective('sombra');
+                            else if (quest.resposta.toLowerCase().includes('shogun')) updateObjective('lider');
+                        }
+                    }
+
+                    // Verifica conclusão total
                     if (currentLevelId === 'egypt') {
                         verificarTodasQuestsConcluidas();
                     } else if (currentLevelId === 'japan') {
@@ -650,7 +755,6 @@ document.addEventListener('DOMContentLoaded', () => {
             interativo.errouUltima = true;
             questAtiva = false;
 
-            // Imagem e cor de derrota variam conforme o mapa atual
             const imgDerrota = currentLevelId === 'japan' ? 'img/japao_derrota.png' : 'img/egito_derrota.png';
             const corDerrota = currentLevelId === 'japan' ? 'rgba(160, 0, 0, 0.8)' : 'rgba(160, 0, 0, 0.8)';
 
@@ -659,13 +763,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 `Voz Misteriosa:\n\n"Errado, mortal... procure outro local..."`,
                 corDerrota,
                 () => {
-                    moverQuestParaOutroLocal(interativo.id); // libera os outros também
+                    moverQuestParaOutroLocal(interativo.id);
                     isDialogOpen = false;
                     console.log(`[QUEST] ${interativo.id} marcada como errada.`);
                 }
             );
         }
     }
+
 
     function verificarTodasQuestsConcluidas() {
         const nivel = levels[currentLevelId];
@@ -713,7 +818,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                             //  Cria o destaque visual do portal
                             destacarPortalJapao();
-
+                            updateUIVisibility("start");
                             //  Mensagem adicional
                             setTimeout(() => {
                                 mostrarCenaComDialogoCor(
@@ -841,6 +946,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isLoadingLevel) return;
         isLoadingLevel = true;
         isDialogOpen = true;
+        updateUIVisibility("jogo");
 
         console.log('[TRANSIÇÃO] Iniciando transição para o Japão...');
 
@@ -911,7 +1017,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function iniciarTransicaoBiblioteca() {
         console.log('[TRANSIÇÃO] Iniciando retorno à biblioteca...');
-
+        updateUIVisibility("library");
         // Remove o brilho do portal (caso ainda esteja ativo)
         if (brilhoPortalJapao) {
             brilhoPortalJapao.remove();
@@ -1339,6 +1445,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- CENAS E TRANSIÇÕES ---
     function transicaoParaLibrary(callback) {
         isDialogOpen = true;
+        updateUIVisibility("library");
         const overlay = document.createElement('div');
         overlay.style.position = 'fixed';
         overlay.style.top = '0';
@@ -1792,142 +1899,208 @@ document.addEventListener('DOMContentLoaded', () => {
     const joystick = { active: false, touchId: null, baseX: 0, baseY: 0, radius: 0, deadzone: 0 };
 
     // --- FUNÇÕES DE CONTROLO E INPUT ---
-    function updateJoystickPosition() {
-        const rect = joystickContainer.getBoundingClientRect();
-        joystick.baseX = rect.left + rect.width / 2;
-        joystick.baseY = rect.top + rect.height / 2;
-        joystick.radius = rect.width / 2;
-        joystick.deadzone = joystick.radius * 0.2;
+
+    function ajustarTamanhoControlesMobile() {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
+        const joystickContainer = document.getElementById("joystick-container");
+        const joystickStick = document.getElementById("joystick-stick");
+        const actionButton = document.getElementById("action-button");
+
+        if (!joystickContainer || !joystickStick || !actionButton) return;
+
+        const base = Math.min(vw, vh);
+
+        const joySize = Math.max(100, base * 0.18); // tamanho do círculo base
+        const stickSize = joySize * 0.55;
+        const btnSize = Math.max(80, base * 0.16);
+
+        // Joystick
+        Object.assign(joystickContainer.style, {
+            width: `${joySize}px`,
+            height: `${joySize}px`,
+            bottom: `${base * 0.06}px`,
+            left: `${base * 0.1}px`,
+            display: "flex",
+        });
+
+        Object.assign(joystickStick.style, {
+            width: `${stickSize}px`,
+            height: `${stickSize}px`,
+            top: `${(joySize - stickSize) / 2}px`,
+            left: `${(joySize - stickSize) / 2}px`,
+        });
+
+        // Botão E — sobrepõe tudo
+        Object.assign(actionButton.style, {
+            width: `${btnSize}px`,
+            height: `${btnSize}px`,
+            bottom: `${base * 0.05}px`,
+            right: `${base * 0.19}px`,
+            fontSize: `${btnSize * 0.4}px`,
+            zIndex: "9999",
+            display: "flex",
+        });
+
+        console.log(`[UI] Controles ajustados — Joy: ${joySize}px | E: ${btnSize}px`);
     }
 
-    function initJoystick() {
+
+    /* ===============================
+   D-PAD (SETAS FIXO)
+================================= */
+
+    function initDPad() {
         const isMobile = 'ontouchstart' in window;
+        const dpad = document.getElementById("joystick-container");
+        const actionButton = document.getElementById("action-button");
+
         if (!isMobile) {
-            joystickContainer.style.display = 'none';
-            actionButton.style.display = 'none';
+            if (dpad) dpad.style.display = 'none';
+            if (actionButton) actionButton.style.display = 'none';
             return;
         }
-        joystickContainer.style.display = 'block';
-        actionButton.style.display = 'flex';
-        updateJoystickPosition();
-        joystickContainer.addEventListener('touchstart', onTouchStart, { passive: false });
-        document.addEventListener('touchmove', onTouchMove, { passive: false });
-        document.addEventListener('touchend', onTouchEnd, { passive: false });
-        actionButton.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            actionButton.classList.add('pressed');
-            handleInteraction();
-        }, { passive: false });
-        actionButton.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            actionButton.classList.remove('pressed');
-        }, { passive: false });
+
+        if (dpad) dpad.style.display = 'block';
+        if (actionButton) actionButton.style.display = 'flex';
+
+        setupDPadButtons();
+        ajustarTamanhoControlesMobile();
     }
 
-    function onTouchStart(event) {
-        event.preventDefault();
-        if (joystick.active) return;
-        const touch = event.changedTouches[0];
-        joystick.active = true;
-        joystick.touchId = touch.identifier;
-        onTouchMove(event);
+    /* cria e conecta as setas */
+    function setupDPadButtons() {
+        const dpad = document.getElementById("joystick-container");
+        if (!dpad) return;
+
+        // Seleciona botões das direções
+        const buttons = {
+            up: dpad.querySelector(".up"),
+            down: dpad.querySelector(".down"),
+            left: dpad.querySelector(".left"),
+            right: dpad.querySelector(".right"),
+        };
+
+        function pressDirection(dir, pressed) {
+            const key = dir === "up" ? "ArrowUp"
+                : dir === "down" ? "ArrowDown"
+                    : dir === "left" ? "ArrowLeft"
+                        : "ArrowRight";
+
+            const type = pressed ? "keydown" : "keyup";
+            // 🔧 Cria um evento mais completo para compatibilidade
+            const evt = new KeyboardEvent(type, {
+                key,
+                bubbles: true,
+                cancelable: true,
+            });
+            document.dispatchEvent(evt);
+        }
+
+        // Liga eventos de toque e mouse
+        Object.entries(buttons).forEach(([dir, btn]) => {
+            if (!btn) return;
+
+            const press = e => {
+                e.preventDefault();
+                e.stopPropagation();
+                pressDirection(dir, true);
+                btn.classList.add("active");
+            };
+
+            const release = e => {
+                e.preventDefault();
+                e.stopPropagation();
+                pressDirection(dir, false);
+                btn.classList.remove("active");
+            };
+
+            // 🔹 Suporte a toque e mouse
+            ["touchstart", "mousedown"].forEach(evt => {
+                btn.addEventListener(evt, press, { passive: false });
+            });
+
+            ["touchend", "mouseup", "mouseleave"].forEach(evt => {
+                btn.addEventListener(evt, release, { passive: false });
+            });
+        });
+
+        // --- Botão E (ação) ---
+        const actionButton = document.getElementById("action-button");
+        if (actionButton) {
+            const pressE = e => {
+                e.preventDefault();
+                e.stopPropagation();
+                actionButton.classList.add("pressed");
+                handleInteraction();
+            };
+
+            const releaseE = e => {
+                e.preventDefault();
+                e.stopPropagation();
+                actionButton.classList.remove("pressed");
+            };
+
+            ["touchstart", "mousedown"].forEach(evt => {
+                actionButton.addEventListener(evt, pressE, { passive: false });
+            });
+            ["touchend", "mouseup", "mouseleave"].forEach(evt => {
+                actionButton.addEventListener(evt, releaseE, { passive: false });
+            });
+        }
+
+        console.log("[D-PAD] Controles configurados com sucesso.");
     }
 
-    function onTouchMove(event) {
-        if (!joystick.active) return;
-        let touch;
-        for (let i = 0; i < event.changedTouches.length; i++) {
-            if (event.changedTouches[i].identifier === joystick.touchId) {
-                touch = event.changedTouches[i];
-                break;
-            }
-        }
-        if (!touch) return;
-        event.preventDefault();
-        let dx = touch.clientX - joystick.baseX;
-        let dy = touch.clientY - joystick.baseY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        if (distance > joystick.radius) {
-            dx = (dx / distance) * joystick.radius;
-            dy = (dy / distance) * joystick.radius;
-        }
-        joystickStick.style.transform = `translate(${dx}px, ${dy}px)`;
-        keys.ArrowUp = keys.ArrowDown = keys.ArrowLeft = keys.ArrowRight = false;
-        if (distance < joystick.deadzone) return;
-        const absDx = Math.abs(dx);
-        const absDy = Math.abs(dy);
-        if (absDx > absDy) {
-            if (dx > 0) keys.ArrowRight = true; else keys.ArrowLeft = true;
-        } else {
-            if (dy > 0) keys.ArrowDown = true; else keys.ArrowUp = true;
-        }
+
+    /* redimensiona conforme tela */
+    function ajustarTamanhoControlesMobile() {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const base = Math.min(vw, vh);
+
+        const dpad = document.getElementById("joystick-container");
+        const actionButton = document.getElementById("action-button");
+        if (!dpad || !actionButton) return;
+
+        const size = Math.max(120, base * 0.22);
+        const btnSize = Math.max(80, base * 0.16);
+
+        Object.assign(dpad.style, {
+            width: `${size}px`,
+            height: `${size}px`,
+            bottom: `${base * 0.05}px`,
+            left: `${base * 0.05}px`,
+            display: "flex"
+        });
+
+        Object.assign(actionButton.style, {
+            width: `${btnSize}px`,
+            height: `${btnSize}px`,
+            bottom: `${base * 0.05}px`,
+            right: `${base * 0.12}px`,
+            fontSize: `${btnSize * 0.4}px`,
+            display: "flex",
+            zIndex: "9999"
+        });
     }
 
-    function onTouchEnd(event) {
-        if (!joystick.active) return;
-        let isOurTouch = false;
-        for (let i = 0; i < event.changedTouches.length; i++) {
-            if (event.changedTouches[i].identifier === joystick.touchId) {
-                isOurTouch = true;
-                break;
-            }
-        }
-        if (!isOurTouch) return;
-        joystick.active = false;
-        joystick.touchId = null;
-        joystickStick.style.transform = 'translate(0px, 0px)';
-        keys.ArrowUp = keys.ArrowDown = keys.ArrowLeft = keys.ArrowRight = false;
+    /* bloqueia arrastar a cruz */
+    function bloquearArrastoDPad() {
+        const dpad = document.getElementById("joystick-container");
+        if (!dpad) return;
+        const bloquear = e => e.preventDefault();
+        ["touchmove", "dragstart", "gesturestart", "mousedown"].forEach(evt => {
+            dpad.addEventListener(evt, bloquear, { passive: false });
+        });
     }
 
-    function initClickToMove() {
-        canvas.addEventListener('click', handleWorldPointer);
-        canvas.addEventListener('touchstart', handleWorldPointer, { passive: false });
-    }
-
-    function handleWorldPointer(event) {
-        let targetId = event.target ? event.target.id : '';
-        if (targetId === 'joystick-container' || targetId === 'joystick-stick' || targetId === 'action-button') return;
-        event.preventDefault();
-        let clientX, clientY;
-        if (event.type === 'touchstart') {
-            if (event.touches.length > 1) return;
-            clientX = event.changedTouches[0].clientX;
-            clientY = event.changedTouches[0].clientY;
-        } else {
-            clientX = event.clientX;
-            clientY = event.clientY;
-        }
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        const screenX = (clientX - rect.left) * scaleX;
-        const screenY = (clientY - rect.top) * scaleY;
-        const worldX = screenX + camera.x;
-        const worldY = screenY + camera.y;
-        findNearestHotspot(worldX, worldY);
-    }
-
-    function findNearestHotspot(worldX, worldY) {
-        const levelData = levels[currentLevelId];
-        if (!levelData.hotspots || isLoadingLevel) return;
-        let nearestHotspot = null;
-        let minDistance = Infinity;
-        const clickRadius = 150;
-        for (const hotspot of levelData.hotspots) {
-            const dx = hotspot.x - worldX;
-            const dy = hotspot.y - worldY;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            if (distance < minDistance && distance < clickRadius) {
-                minDistance = distance;
-                nearestHotspot = hotspot;
-            }
-        }
-        if (nearestHotspot) {
-            player.targetX = nearestHotspot.x;
-            player.targetY = nearestHotspot.y;
-            keys.ArrowUp = keys.ArrowDown = keys.ArrowLeft = keys.ArrowRight = false;
-        }
-    }
+    /* inicialização */
+    window.addEventListener("load", () => {
+        initDPad();
+        bloquearArrastoDPad();
+    });
 
     function initDebugTools() {
         if (!DEBUG_MODE) return;
@@ -1956,7 +2129,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const canvasStyle = window.getComputedStyle(canvas);
         if (canvasStyle.display === 'none') {
-            if (event.key === 'Enter') {
+            if (event.key === 'Enter' || event.key === 'e' || event.key === 'E') {
                 event.preventDefault();
                 startGame();
             }
@@ -2059,11 +2232,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleInteraction(e) {
-        console.log('[HANDLE] tecla pressionada:', e.key, 'isDialogOpen:', isDialogOpen);
+        // 🛡️ Protege contra eventos sem 'key' (como cliques no botão "E")
+        const key = e?.key || 'E'; // usa 'E' como padrão se não houver tecla
+        console.log('[HANDLE] tecla pressionada:', key, 'isDialogOpen:', isDialogOpen);
 
         if (isLoadingLevel) return;
         const levelData = levels[currentLevelId];
-        if (!levelData.interactables) return;
+        if (!levelData?.interactables) return;
 
         const box = calculatePlayerInteractionBox();
 
@@ -2098,54 +2273,221 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
+    // --- TOQUE NA TELA AGE COMO "E" DURANTE DIÁLOGOS ---
+    // --- Toque na tela age como tecla "E" apenas após o canvas estar pronto ---
+    function ativarToqueUniversal() {
+        if (!("ontouchstart" in window)) return;
+        if (window._touchHandlerAtivado) return;
+        window._touchHandlerAtivado = true;
+
+        let lastTouch = 0;
+        const TOUCH_DEBOUNCE_MS = 300;
+
+        document.addEventListener("touchstart", (ev) => {
+            const now = Date.now();
+            if (now - lastTouch < TOUCH_DEBOUNCE_MS) {
+                // ignora toques muito seguidos
+                return;
+            }
+            lastTouch = now;
+
+            // ignora toques no joystick ou no botão E
+            if (ev.target.closest && (ev.target.closest("#joystick-container") || ev.target.closest("#action-button"))) {
+                return;
+            }
+
+            // referência para a tela inicial
+            const startScreen = document.getElementById("start-screen");
+
+            // 1) Se ainda estiver na tela inicial -> inicia o jogo
+            if (startScreen && startScreen.style.display !== "none") {
+                console.log("[TOQUE] Toque na tela inicial -> iniciar jogo");
+                // esconde start screen do mesmo jeito que seu fluxo de start faz
+                startScreen.style.display = "none";
+                // mostra canvas (caso esteja oculto)
+                if (canvas) canvas.style.display = "block";
+                // chama startGame se existir
+                if (typeof startGame === "function") {
+                    startGame();
+                }
+                // garante que o canvas e controles sejam recalculados
+                if (typeof resizeCanvas === "function") resizeCanvas();
+                if (typeof ajustarTamanhoControlesMobile === "function") ajustarTamanhoControlesMobile();
+                return;
+            }
+
+            // 2) Se houver diálogo aberto -> avança/dialogo (dispara keydown + fallback)
+            if (typeof isDialogOpen !== "undefined" && isDialogOpen) {
+                console.log("[TOQUE] Diálogo aberto -> avançar (simula E)");
+                // dispara um keydown (algumas rotinas escutam isso)
+                try {
+                    const evt = new KeyboardEvent("keydown", { key: "E" });
+                    document.dispatchEvent(evt);
+                } catch (err) {
+                    // ignore se o navegador bloquear criação de eventos
+                }
+                // fallback direto para handleInteraction
+                if (typeof handleInteraction === "function") handleInteraction({ key: "E", type: "touchstart" });
+                return;
+            }
+
+            // 3) Caso geral em jogo -> agir como E (interagir)
+            console.log("[TOQUE] Em jogo -> agir como E / tentar interação");
+            if (typeof handleInteraction === "function") handleInteraction({ key: "E", type: "touchstart" });
+        }, { passive: true }); // passive evita bloqueios de scroll; não chamamos preventDefault aqui
+    }
+
+    // ativa após carregamento (coloca pequeno delay para não conflitar com resize inicial)
+    window.addEventListener("load", () => {
+        setTimeout(ativarToqueUniversal, 200);
+    });
+
+
+
 
     function resizeCanvas() {
-        console.log("--- resizeCanvas INICIADO ---"); // LOG Início
+        console.log("--- resizeCanvas INICIADO ---");
 
-        const aspectRatio = GAME_WIDTH / GAME_HEIGHT;
+        const aspectRatio = 16 / 9;
         const windowWidth = window.innerWidth;
         const windowHeight = window.innerHeight;
-        console.log(`Window Dimensions: ${windowWidth}w x ${windowHeight}h`); // LOG Janela
-
         const windowRatio = windowWidth / windowHeight;
 
-        let newWidth;
-        let newHeight;
+        let newWidth, newHeight;
 
         if (windowRatio > aspectRatio) {
+            // tela mais larga → limitado pela altura
             newHeight = windowHeight;
             newWidth = newHeight * aspectRatio;
-            console.log(`Modo Landscape/Wide: Limitado pela Altura.`); // LOG Modo
+            console.log("Modo Landscape/Wide: limitado pela altura.");
         } else {
+            // tela mais alta → limitado pela largura
             newWidth = windowWidth;
             newHeight = newWidth / aspectRatio;
-            console.log(`Modo Portrait/Tall: Limitado pela Largura.`); // LOG Modo
+            console.log("Modo Portrait/Tall: limitado pela largura.");
         }
 
-        // Arredonda para evitar pixels quebrados
+        // 🔧 Arredonda e evita cortes de pixel
         newWidth = Math.floor(newWidth);
         newHeight = Math.floor(newHeight);
 
-        console.log(`Calculated Canvas Style: ${newWidth}px w x ${newHeight}px h`); // LOG Calculado
+        // ✅ Centraliza via transform (sem cálculos de offset)
+        Object.assign(canvas.style, {
+            position: "fixed",
+            left: "50%",
+            top: "50%",
+            transform: "translate(-50%, -50%)",
+            width: `${newWidth}px`,
+            height: `${newHeight}px`,
+            maxWidth: "100vw",
+            maxHeight: "100vh",
+            margin: "0",
+            padding: "0",
+            border: "none"
+        });
 
-        // Aplica o novo tamanho ao estilo do canvas
-        canvas.style.width = `${newWidth}px`;
-        canvas.style.height = `${newHeight}px`;
+        // 🔁 Mantém resolução interna do jogo (nunca altera GAME_WIDTH/GAME_HEIGHT)
+        if (typeof GAME_WIDTH !== "undefined" && typeof GAME_HEIGHT !== "undefined") {
+            canvas.width = GAME_WIDTH;
+            canvas.height = GAME_HEIGHT;
+        }
 
-        console.log(`Applied Style - Width: ${canvas.style.width}, Height: ${canvas.style.height}`); // LOG Aplicado
-
-        // Pega as dimensões *reais* do elemento após aplicar o estilo
-        // (setTimeout pequeno para dar tempo ao navegador de renderizar)
-        setTimeout(() => {
-            const rect = canvas.getBoundingClientRect();
-            console.log(`Actual Element Rect (after style): ${rect.width.toFixed(2)}w x ${rect.height.toFixed(2)}h`); // LOG Real
-        }, 10); // Aumentei ligeiramente o tempo para garantir a leitura
-
-        if ('ontouchstart' in window) {
+        // 🧩 Sincroniza elementos visuais
+        if ("ontouchstart" in window && typeof updateJoystickPosition === "function") {
             updateJoystickPosition();
         }
-        console.log(`--- resizeCanvas FINALIZADO --- Canvas Attrs: ${canvas.width}x${canvas.height}`); // LOG Fim
+
+        if (typeof ajustarEscalaStartScreen === "function") {
+            ajustarEscalaStartScreen();
+        }
+        if ("ontouchstart" in window && typeof ajustarTamanhoControlesMobile === "function") {
+            ajustarTamanhoControlesMobile();
+        }
+        if ("ontouchstart" in window && typeof bloquearArrastoDPad === "function") {
+            bloquearArrastoDPad();
+        }
+        if (joystickContainer) {
+            joystickContainer.addEventListener("touchstart", e => e.preventDefault(), { passive: false });
+            joystickContainer.addEventListener("touchmove", e => e.preventDefault(), { passive: false });
+            joystickContainer.addEventListener("mousedown", e => e.preventDefault());
+            joystickContainer.addEventListener("mousemove", e => e.preventDefault());
+        }
+
+
+        // Espera o navegador renderizar para log
+        setTimeout(() => {
+            const rect = canvas.getBoundingClientRect();
+            console.log(`Canvas renderizado: ${rect.width.toFixed(2)}w x ${rect.height.toFixed(2)}h`);
+        }, 30);
+
+        console.log(`Canvas centralizado: ${newWidth}x${newHeight}`);
+        console.log("--- resizeCanvas FINALIZADO ---");
     }
+
+    // Impede que o D-pad seja arrastado ou cause scroll
+    function bloquearArrastoDPad() {
+        const dpad = document.getElementById("joystick-container");
+        if (!dpad) return;
+
+        const bloquear = e => {
+            e.preventDefault();
+            e.stopImmediatePropagation(); // 🔒 impede que o toque vá para o canvas
+            return false;
+        };
+
+        [
+            "touchstart",
+            "touchmove",
+            "touchend",
+            "mousedown",
+            "mousemove",
+            "mouseup",
+            "dragstart",
+            "gesturestart",
+            "contextmenu",
+            "pointerdown",
+            "pointermove",
+            "pointerup"
+        ].forEach(evt => {
+            dpad.addEventListener(evt, bloquear, { passive: false });
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        if ("ontouchstart" in window) {
+            document.getElementById("joystick-container").style.display = "block";
+            setupDPad();
+            ajustarTamanhoControlesMobile();
+            bloquearArrastoDPad(); // 🔒 impede qualquer arraste
+        }
+    });
+
+
+    function ajustarEscalaStartScreen() {
+        const startScreen = document.getElementById("start-screen");
+        if (!startScreen) return;
+
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+
+        // Base 16:9 também
+        const baseAspect = 16 / 9;
+        const currentAspect = windowWidth / windowHeight;
+
+        let escala;
+
+        if (currentAspect > baseAspect) {
+            // tela mais larga — escala pela altura
+            escala = windowHeight / 600;
+        } else {
+            // tela mais alta — escala pela largura
+            escala = windowWidth / 900;
+        }
+
+        startScreen.style.transform = `translate(-50%, -50%) scale(${escala})`;
+    }
+
+
 
     function update() {
         if (isDialogOpen || isLoadingLevel) return;
@@ -2259,7 +2601,7 @@ document.addEventListener('DOMContentLoaded', () => {
         camera.x = Math.max(0, Math.min(camera.x, levelData.mapWidth - camera.width));
         camera.y = Math.max(0, Math.min(camera.y, levelData.mapHeight - camera.height));
 
-    
+
 
     }
 
@@ -2484,6 +2826,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 isGameLoopRunning = true;
                 gameLoop();
             }
+
+            //  ADIÇÃO: Inicializa os objetivos da fase ---
+            if (typeof initObjectives === 'function') {
+                initObjectives(levelId);
+            }
+
         };
         if (assets.maps[levelId] && assets.maps[levelId].complete) {
             onMapReady();
@@ -2548,91 +2896,156 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
+    document.getElementById('start-screen').style.position = 'absolute';
+    canvas.parentElement.appendChild(document.getElementById('start-screen'));
 
-    window.addEventListener('resize', resizeCanvas);
+    // ✅ Garante proporção 16:9, joystick e botão E responsivos
+
+    window.addEventListener("resize", () => {
+        // Evita múltiplas execuções seguidas
+        clearTimeout(window._resizeTimeout);
+        window._resizeTimeout = setTimeout(() => {
+            resizeCanvas();
+            ajustarTamanhoControlesMobile(); // 🔹 redimensiona joystick/botão E
+        }, 150);
+    });
+
+    window.addEventListener("orientationchange", () => {
+        // Em muitos celulares, o resize vem atrasado
+        setTimeout(() => {
+            resizeCanvas();
+            ajustarTamanhoControlesMobile();
+        }, 400);
+    });
+
+    // Ao entrar ou sair do fullscreen, ajusta também
+    document.addEventListener("fullscreenchange", () => {
+        resizeCanvas();
+        ajustarTamanhoControlesMobile();
+    });
+    document.addEventListener("webkitfullscreenchange", () => {
+        resizeCanvas();
+        ajustarTamanhoControlesMobile();
+    }); // Safari
+    document.addEventListener("msfullscreenchange", () => {
+        resizeCanvas();
+        ajustarTamanhoControlesMobile();
+    });
+
+    // Primeiro ajuste no carregamento
+    window.addEventListener("load", () => {
+        resizeCanvas();
+        ajustarTamanhoControlesMobile();
+    });
+
 
     // --- PONTO DE ENTRADA ---
     resizeCanvas();
-    initJoystick();
-    initClickToMove();
     initDebugTools();
+
 
     // Preenchimento das funções de input para garantir que existem
     // (O seu ficheiro já deve ter estas definições completas, isto é uma salvaguarda)
     // --- JOYSTICK E CONTROLE TOUCH ---
-const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|Mobile/i.test(navigator.userAgent);
+    const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|Mobile/i.test(navigator.userAgent);
 
-if (isMobile) {
-    joystickContainer.style.display = "flex";
-    actionButton.style.display = "flex";
+    if (isMobile) {
+        joystickContainer.style.display = "flex";
+        actionButton.style.display = "flex";
 
-    const joystick = {
-        active: false,
-        radius: 60,
-        baseX: 0,
-        baseY: 0,
-        touchId: null,
-        deadzone: 10,
-    };
+        const joystick = {
+            active: false,
+            radius: 60,
+            baseX: 0,
+            baseY: 0,
+            touchId: null,
+            deadzone: 10,
+        };
 
-    // toque inicial
-    joystickContainer.addEventListener("touchstart", (e) => {
-        const touch = e.changedTouches[0];
-        const rect = joystickContainer.getBoundingClientRect();
-        joystick.active = true;
-        joystick.touchId = touch.identifier;
-        joystick.baseX = rect.left + rect.width / 2;
-        joystick.baseY = rect.top + rect.height / 2;
-    });
+        // toque inicial
+        joystickContainer.addEventListener("touchstart", (e) => {
+            const touch = e.changedTouches[0];
+            const rect = joystickContainer.getBoundingClientRect();
+            joystick.active = true;
+            joystick.touchId = touch.identifier;
+            joystick.baseX = rect.left + rect.width / 2;
+            joystick.baseY = rect.top + rect.height / 2;
+        });
 
-    // movimento do toque
-    joystickContainer.addEventListener("touchmove", (e) => {
-        if (!joystick.active) return;
-        let touch = [...e.changedTouches].find(t => t.identifier === joystick.touchId);
-        if (!touch) return;
-        e.preventDefault();
+        // movimento do toque
+        joystickContainer.addEventListener("touchmove", (e) => {
+            if (!joystick.active) return;
+            let touch = [...e.changedTouches].find(t => t.identifier === joystick.touchId);
+            if (!touch) return;
+            e.preventDefault();
 
-        let dx = touch.clientX - joystick.baseX;
-        let dy = touch.clientY - joystick.baseY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        if (distance > joystick.radius) {
-            dx = (dx / distance) * joystick.radius;
-            dy = (dy / distance) * joystick.radius;
+            let dx = touch.clientX - joystick.baseX;
+            let dy = touch.clientY - joystick.baseY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance > joystick.radius) {
+                dx = (dx / distance) * joystick.radius;
+                dy = (dy / distance) * joystick.radius;
+            }
+
+            joystickStick.style.transform = `translate(${dx}px, ${dy}px)`;
+
+            // define direção
+            keys.ArrowUp = keys.ArrowDown = keys.ArrowLeft = keys.ArrowRight = false;
+            if (distance < joystick.deadzone) return;
+            const absDx = Math.abs(dx);
+            const absDy = Math.abs(dy);
+            if (absDx > absDy) {
+                dx > 0 ? (keys.ArrowRight = true) : (keys.ArrowLeft = true);
+            } else {
+                dy > 0 ? (keys.ArrowDown = true) : (keys.ArrowUp = true);
+            }
+        });
+
+        // soltar o toque
+        joystickContainer.addEventListener("touchend", (e) => {
+            let touch = [...e.changedTouches].find(t => t.identifier === joystick.touchId);
+            if (!touch) return;
+            joystick.active = false;
+            joystick.touchId = null;
+            joystickStick.style.transform = "translate(0, 0)";
+            keys.ArrowUp = keys.ArrowDown = keys.ArrowLeft = keys.ArrowRight = false;
+        });
+
+        // botão E (ação/interação)
+        // botão E (ação/interação)
+        actionButton.addEventListener("touchstart", () => {
+            actionButton.classList.add("pressed");
+
+            // Se o start-screen ainda está visível, começa o jogo
+            const startScreen = document.getElementById('start-screen');
+            if (startScreen && startScreen.style.display !== 'none') {
+                console.log('[HANDLE] E pressionado na tela inicial → iniciar jogo');
+                startScreen.style.display = 'none';
+                canvas.style.display = 'block';
+                if (typeof startGame === 'function') startGame(); // usa sua função original
+                return;
+            }
+
+            // Caso contrário, executa interação normal no jogo
+            handleInteraction({ key: 'E' });
+        });
+
+        actionButton.addEventListener("touchend", () => {
+            actionButton.classList.remove("pressed");
+        });
+    }
+
+    function updateUIVisibility(screen) {
+        // screen pode ser: "start", "biblioteca" ou "jogo"
+        if (screen === "start" || screen === "library") {
+            // 🔹 Esconde tudo
+            objectivesPanel.style.display = "none";
+        } else if (screen === "jogo") {
+            // 🔹 Mostra elementos conforme o dispositivo
+            objectivesPanel.style.display = "block";
         }
+    }
 
-        joystickStick.style.transform = `translate(${dx}px, ${dy}px)`;
-
-        // define direção
-        keys.ArrowUp = keys.ArrowDown = keys.ArrowLeft = keys.ArrowRight = false;
-        if (distance < joystick.deadzone) return;
-        const absDx = Math.abs(dx);
-        const absDy = Math.abs(dy);
-        if (absDx > absDy) {
-            dx > 0 ? (keys.ArrowRight = true) : (keys.ArrowLeft = true);
-        } else {
-            dy > 0 ? (keys.ArrowDown = true) : (keys.ArrowUp = true);
-        }
-    });
-
-    // soltar o toque
-    joystickContainer.addEventListener("touchend", (e) => {
-        let touch = [...e.changedTouches].find(t => t.identifier === joystick.touchId);
-        if (!touch) return;
-        joystick.active = false;
-        joystick.touchId = null;
-        joystickStick.style.transform = "translate(0, 0)";
-        keys.ArrowUp = keys.ArrowDown = keys.ArrowLeft = keys.ArrowRight = false;
-    });
-
-    // botão E (ação/interação)
-    actionButton.addEventListener("touchstart", () => {
-        actionButton.classList.add("pressed");
-        handleInteraction();
-    });
-    actionButton.addEventListener("touchend", () => {
-        actionButton.classList.remove("pressed");
-    });
-}
 
     function criarBotaoFullscreen() {
         // Evita duplicação
@@ -2676,7 +3089,9 @@ if (isMobile) {
         const doc = document;
         const elem = document.documentElement;
 
-        if (!doc.fullscreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+        const entrouFullscreen = !doc.fullscreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement;
+
+        if (entrouFullscreen) {
             if (elem.requestFullscreen) {
                 elem.requestFullscreen();
             } else if (elem.webkitRequestFullscreen) {
@@ -2695,6 +3110,14 @@ if (isMobile) {
             }
             console.log('[FULLSCREEN] Saiu do modo tela cheia');
         }
+
+        // 🔧 Garante que o canvas seja reajustado logo após a mudança
+        setTimeout(() => {
+            if (typeof resizeCanvas === 'function') {
+                resizeCanvas();
+                console.log('[FULLSCREEN] Canvas reajustado após alteração de tela cheia.');
+            }
+        }, 200);
     }
 
     // Inicia automaticamente no carregamento

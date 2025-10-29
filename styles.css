@@ -1,18 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
 body {
     margin: 0;
     padding: 0;
     font-family: 'Press Start 2P', cursive;
-    overflow: hidden; /* Esconde as barras de rolagem */
+    overflow: hidden;
+    /* Esconde as barras de rolagem */
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100vw;
     height: 100vh;
     position: relative;
-    
-     /* 1. Define a imagem de fundo */
-    background-image: url('https://uploads.onecompiler.io/43rztqetx/43zh9k8ba/papibagrigafroisja.png'); /* <-- ATENÇÃO AO CAMINHO! */
+
+    /* 1. Define a imagem de fundo */
+    background-image: url('https://uploads.onecompiler.io/43rztqetx/43zh9k8ba/papibagrigafroisja.png');
+    /* <-- ATENÇÃO AO CAMINHO! */
 
     /* 2. Garante que a imagem cubra toda a tela sem distorcer */
     background-size: cover;
@@ -22,86 +25,108 @@ body {
 
     /* 4. Evita que a imagem se repita */
     background-repeat: no-repeat;
-    
+
     /* O fundo preto só aparecerá se a imagem não carregar */
-    background-color: #000; 
-    
+    background-color: #000;
+
     &:after {
 
-    content: '';
+        content: '';
 
-    position: absolute;
+        position: absolute;
 
-    top: 0;
+        top: 0;
 
-    left: 0;
+        left: 0;
 
-    width: 100%;
+        width: 100%;
 
-    height: 100%;
+        height: 100%;
 
-    /* Sombra interna que cria o efeito de vinheta */
+        /* Sombra interna que cria o efeito de vinheta */
 
-    box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.7);
+        box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.7);
 
-    pointer-events: none; /* Garante que a camada não intercepte cliques */
+        pointer-events: none;
+        /* Garante que a camada não intercepte cliques */
+
+    }
 
 }
-   
-}
-
 
 /* --- Estilos da Tela de Início --- */
 #start-screen {
-    display: flex; /* Garante que a tela esteja visível */
-    flex-direction: column; /* Empilha os itens verticalmente */
-    align-items: center; /* Centraliza os itens horizontalmente */
-    text-align: center;
-    max-width: 800px;
-    /* Adiciona um preenchimento para o texto não ficar colado nas bordas */
-    padding: 40px;
-    /* Adiciona bordas arredondadas para um visual mais suave */
-    border-radius: 10px;
-    position: fixed; /* Ou 'absolute' se preferir */
-    top: 50%;
+    position: fixed;
     left: 50%;
-    transform: translate(-50%, -50%); /* Centraliza perfeitamente */
-    z-index: 100; /* Garante que fique sobre outros elementos */
-    color: white; /* Cor do texto padrão */
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: min(90vw, 1000px);
+    max-height: 90vh;
+    /* 🔹 impede que ultrapasse a altura da tela */
+    padding: 3vh 3vw;
+    text-align: center;
+    color: white;
+    z-index: 9999;
     box-sizing: border-box;
 }
 
 .game-title {
-    font-size: 4rem; /* 4 vezes o tamanho da fonte padrão */
-    color: #8a4a0e; /* Um marrom claro  */
-    text-shadow: 3px 3px 0px #331c06; /* Sombra marrom escuro para dar um efeito 3D */
+    font-size: clamp(2.5rem, 6vw, 3rem);
+    /* 4 vezes o tamanho da fonte padrão */
+    color: #8a4a0e;
+    /* Um marrom claro  */
+    text-shadow: 3px 3px 0px #331c06;
+    text-align: center;
+    /* Sombra marrom escuro para dar um efeito 3D */
     margin-bottom: 40px;
+    letter-spacing: 2px;
+
+
 }
 
 .game-summary {
-    font-size: 1rem;
-    line-height: 1.6; /* Espaçamento entre linhas para melhor leitura */
-    max-width: 600px;
-    margin: 0 auto 60px; /* Margem automática nas laterais para centralizar */
+    font-size: clamp(0.7rem, 1.4vw, 0.9rem);
+    line-height: 1.8;
+    /* 🔹 Aumenta o espaçamento entre linhas */
+    letter-spacing: 0.5px;
+    /* 🔹 Dá mais “ar” horizontalmente */
+
+    max-width: 680px;
+    /* 🔹 Mais largura para não quebrar tanto */
+    margin: 0 auto 50px;
+
     color: #ddd;
     text-align: center;
-    background-color: rgba(0, 0, 0, 0.6); /* Preto com 60% de opacidade */
-    padding: 20px 30px; /* Espaçamento interno */
-    border: 2px solid rgba(255, 255, 255, 0.2); /* Borda sutil */
-    border-radius: 5px; /* Bordas levemente arredondadas */
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 10px 20px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    box-sizing: border-box;
+
+    /* 🔹 Pequeno efeito de sombra interna suave */
+    box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.4);
 }
 
 .start-prompt {
     font-size: 1.2rem;
-    color: #FFD700; /* Cor de ouro */
+    color: #FFD700;
+    /* Cor de ouro */
     text-shadow: 2px 2px 4px #000;
-    animation: blink 1.5s step-end infinite; /* Animação de piscar */
+    animation: blink 1.5s step-end infinite;
+    /* Animação de piscar */
 }
 
 /* Animação para o texto piscar */
 @keyframes blink {
-    from, to { opacity: 1; }
-    50% { opacity: 0; }
+
+    from,
+    to {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
 }
 
 .credits {
@@ -119,41 +144,116 @@ body {
 
 /* Estilos do Joystick Virtual */
 #joystick-container {
-    /* Posicionamento */
-    position: fixed; /* Fica fixo na tela */
-    bottom: 30px;
-    left: 30px;
-    
-    /* Tamanho e Aparência (Círculo Base) */
-    width: 150px;
-    height: 150px;
-    background-color: rgba(100, 100, 100, 0.3);
-    border-radius: 50%; /* Faz ser um círculo */
-    
-    /* Outros */
-    display: none; /* Começa escondido (JS vai mostrar em celular) */
-    z-index: 10;
-    -webkit-user-select: none; /* Impede seleção de texto */
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+    position: fixed;
+    bottom: 6vh;
+    left: 5vw;
+    width: 160px;
+    height: 160px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    place-items: center;
+    gap: 8px;
+    z-index: 9999;
+    pointer-events: auto !important;
+    touch-action: none !important;
+    user-select: none !important;
 }
 
+
+
+/* grade das setas */
 #joystick-stick {
-    /* Posicionamento (relativo ao container) */
-    position: absolute;
-    top: 35px; /* (150 - 80) / 2 */
-    left: 35px; /* (150 - 80) / 2 */
-
-    /* Tamanho e Aparência (Botão) */
-    width: 80px;
-    height: 80px;
-    background-color: rgba(150, 150, 150, 0.6);
-    border-radius: 50%;
-    
-    /* Transição suave para voltar ao centro */
-    transition: transform 0.1s ease-out;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    place-items: center;
+    pointer-events: none;
 }
+
+/* botões direcionais (setas) */
+#joystick-stick div {
+    width: 40px;
+    /* ligeiramente maior */
+    height: 40px;
+    background: rgba(50, 35, 10, 0.6);
+    border: 2px solid #d4af37;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Press Start 2P', cursive;
+    color: #fff;
+    font-size: 20px;
+    box-shadow: 0 3px 0 #4a360c, 0 0 6px rgba(255, 215, 0, 0);
+    transition: all 0.15s ease;
+    touch-action: manipulation;
+    pointer-events: auto;
+}
+
+/* width: 50px;
+    height: 50px;
+    background: rgba(40, 25, 5, 0.6);
+    border: 2px solid #d4af37;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 18px;
+    box-shadow: 0 3px 0 #4a360c;
+    transition: all 0.15s ease;
+    touch-action: manipulation;
+    pointer-events: auto;*/
+
+/* --- Animação de clique (pressão com brilho curto) --- */
+#joystick-stick div.active {
+    transform: translateY(2px) scale(0.97);
+    background: rgba(255, 215, 0, 0.15);
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.7);
+}
+
+/* --- Posicionamento padrão das setas --- */
+#joystick-stick .up {
+    grid-area: 1 / 2;
+}
+
+#joystick-stick .down {
+    grid-area: 3 / 2;
+}
+
+#joystick-stick .left {
+    grid-area: 2 / 1;
+}
+
+#joystick-stick .right {
+    grid-area: 2 / 3;
+}
+
+#joystick-container,
+#joystick-stick,
+#joystick-stick div {
+    touch-action: none !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -webkit-user-drag: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    overscroll-behavior: contain !important;
+}
+
+@media (max-width: 480px) {
+    #joystick-container {
+        width: 26vw;
+        height: 26vw;
+        bottom: 5vh;
+        left: 4vw;
+    }
+}
+
 /* Estilo do Botão de Ação */
 #action-button {
     /* Posicionamento */
@@ -165,19 +265,21 @@ body {
     width: 100px;
     height: 100px;
     background-color: rgba(150, 150, 150, 0.6);
-    border-radius: 50%; /* Círculo */
-    
+    border-radius: 50%;
+    /* Círculo */
+
     /* Centralizar o texto "E" */
-    display: none; /* Começa escondido */
+    display: none;
+    /* Começa escondido */
     justify-content: center;
     align-items: center;
-    
+
     /* Estilo do Texto */
     font-size: 40px;
     font-weight: bold;
     color: white;
     font-family: Arial, sans-serif;
-    
+
     /* Outros */
     z-index: 10;
     -webkit-user-select: none;
@@ -193,13 +295,212 @@ body {
     transform: scale(0.95);
 }
 
-
 canvas {
     display: none;
     border: 2px solid #00ffff;
     background-color: black;
     box-sizing: border-box;
-    image-rendering: pixelated; 
+    image-rendering: pixelated;
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
+}
+
+/* --- Painel de Objetivos --- */
+#objectives-panel {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 270px;
+    max-height: 420px;
+    background: rgba(15, 10, 0, 0.8);
+    border: 3px solid #d4af37;
+    border-radius: 8px;
+    color: #fff;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 11px;
+    overflow-y: auto;
+    z-index: 9999;
+    box-shadow: 0 0 18px rgba(255, 230, 120, 0.35);
+    backdrop-filter: blur(3px);
+    transition: transform 0.4s ease;
+}
+
+/* === Cabeçalho estilizado === */
+#objectives-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(180deg, #d8b84b 0%, #8f6b1c 100%);
+    border-bottom: 2px solid #d4af37;
+    color: #2a1a00;
+    text-shadow: 0 1px 0 #ffe388;
+    font-weight: bold;
+    font-size: 11px;
+    padding: 8px 10px;
+    border-radius: 5px 5px 0 0;
+    box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.4), 0 2px 2px rgba(255, 255, 255, 0.1);
+}
+
+/* === Botão recolher embutido === */
+#objectives-toggle-btn {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 10px;
+    color: #2a1a00;
+    background: linear-gradient(180deg, #ffe388 0%, #d8b84b 100%);
+    border: 2px solid #a07800;
+    border-radius: 4px;
+    padding: 2px 6px;
+    cursor: pointer;
+    box-shadow: 0 2px 0 #4a360c;
+    text-shadow: 0 1px 0 #fff8b0;
+}
+
+#objectives-toggle-btn:hover {
+    filter: brightness(1.15);
+}
+
+#objectives-toggle-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #4a360c;
+}
+
+/* === Lista === */
+#objectives-list {
+    list-style: none;
+    margin: 10px 0 8px 0;
+    padding: 0;
+}
+
+#objectives-list li {
+    display: flex;
+    align-items: center;
+    margin: 8px 10px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    background: rgba(255, 255, 200, 0.08);
+    border: 1px solid rgba(255, 215, 100, 0.25);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    line-height: 1.4;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+/* quadradinho do progresso */
+#objectives-list li::before {
+    content: "◻️";
+    margin-right: 8px;
+    font-size: 10px;
+    opacity: 0.85;
+    color: #ffdf80;
+}
+
+/* completado */
+#objectives-list li.completed {
+    background: rgba(100, 255, 100, 0.1);
+    border-color: rgba(0, 255, 100, 0.5);
+    color: #aaff9f;
+    text-decoration: line-through;
+    text-shadow: 0 0 4px #00ff80;
+}
+
+#objectives-list li.completed::before {
+    content: "✅";
+}
+
+/* recolhido */
+#objectives-panel.collapsed #objectives-list {
+    display: none;
+}
+
+#joystick-container,
+#action-button {
+    display: none !important;
+    /* Esconde por padrão */
+}
+
+@media (pointer: coarse) {
+    body {
+        overflow: hidden;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        width: 100vw;
+        height: 100vh;
+    }
+
+    canvas {
+        display: none;
+        /* começa invisível até o JS mostrar */
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw !important;
+        height: 100vh !important;
+        border: none;
+        margin: 0;
+        padding: 0;
+        background: black;
+    }
+
+    canvas.show,
+    canvas[style*="display: block"] {
+        display: block !important;
+    }
+
+    #start-screen {
+        width: min(90vw, 950px);
+        max-height: 90vh;
+        padding: 4vh 4vw;
+        transform: translate(-50%, -50%);
+        font-size: clamp(0.8rem, 2.5vw, 1.2rem);
+    }
+
+    .game-title {
+        font-size: clamp(1.2rem, 4vw, 4rem);
+        text-shadow: 2px 2px 0px #000;
+        margin-bottom: 2vh;
+        position: fixed;
+        transform: translate(60%, -800%);
+        justify-content: center;
+
+    }
+
+    .game-summary {
+        font-size: clamp(0.6rem, 1.8vw, 0.9rem);
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: min(90vw, 1000px);
+        max-height: 100vh;
+        overflow-y: auto;
+
+        text-align: center;
+    }
+
+    .start-prompt {
+        font-size: clamp(0.7rem, 2vw, 1rem);
+        margin-top: 1.5vh;
+        text-shadow: 1px 1px 3px #000;
+    }
+
+    #joystick-container,
+    #action-button {
+        display: flex !important;
+    }
+
+    #objectives-panel {
+        font-size: 9px;
+        width: 200px;
+        max-height: 250px;
+    }
+
+    #objectives-header {
+        font-size: 9px;
+        padding: 6px 8px;
+    }
+
+    #objectives-toggle-btn {
+        font-size: 8px;
+        padding: 2px 5px;
+    }
 }
