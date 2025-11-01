@@ -1223,19 +1223,7 @@ document.addEventListener('DOMContentLoaded', () => {
             "Parece que estou no Japão, mas numa época bem diferente da atual... isso é incrível, mas não entendo o porquê estou aqui ainda.",
             "rgba(0, 60, 160, 0.8)",
             () => {
-                // efeito de tremor
-                const canvas = document.getElementById("gameCanvas");
-                const style = document.createElement("style");
-                style.innerHTML = `
-                @keyframes tremor {
-                    0%, 100% { transform: translate(0, 0); }
-                    20% { transform: translate(-5px, 3px); }
-                    40% { transform: translate(5px, -3px); }
-                    60% { transform: translate(-4px, 2px); }
-                    80% { transform: translate(4px, -2px); }
-                }`;
-                document.head.appendChild(style);
-                canvas.style.animation = "tremor 0.5s ease-in-out 3";
+                iniciarTremorTela(800);
 
                 setTimeout(() => {
                     mostrarCenaComDialogoCor(
@@ -3127,5 +3115,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', initAudio, { once: true });
     document.addEventListener('keydown', initAudio, { once: true });
 });
+
 
 
